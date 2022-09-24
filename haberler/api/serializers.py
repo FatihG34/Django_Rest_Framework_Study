@@ -1,8 +1,29 @@
 from rest_framework import serializers
 from haberler.models import Makele
 
+from datetime import datetime
+from django.utils.timesince import timesince
 
-class MakeleSerializer(serializers.Serializer):
+
+class MakeleSerializer(serializers.ModelSerializer):
+    time_since_pub = serializers.SerializerMethodField()
+    class Meta:
+        model=Makele
+        fields = '__all__'
+        # fields = ["author", "title", "content"]
+        # exclude = ["created_time", "updated_date"]
+        read_only_fields = ["id", "created_time", "updated_date"]
+    
+    def get_time_since_pub(self, obj):
+        now = datetime.now()
+        pub_time = obj.published_date
+        time_delta = timesince(pub_time, now)
+        return time_delta
+
+
+
+# Standart Serializer Code 👇🏻
+class MakeleDefaultSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     author = serializers.CharField()
     title = serializers.CharField()
