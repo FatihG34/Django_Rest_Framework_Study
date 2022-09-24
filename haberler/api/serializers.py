@@ -29,3 +29,13 @@ class MakeleSerializer(serializers.Serializer):
         instance.is_active = validated_data.get("is_active", instance.is_active)
         instance.save()
         return instance
+    
+    def validate(self, data):
+        if data['title'] == data['description']:
+            raise serializers.ValidationError('Title and Description must be different')
+        return data
+
+    def validate_title(self, value):
+        if len(value) < 20 :
+            raise serializers.ValidationError(f'Title must be greater than 20 char, you entered {len(value)}')
+        return value
