@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from haberler.models import Makele
 
-from datetime import datetime
+from datetime import datetime, date
 from django.utils.timesince import timesince
 
 
@@ -17,9 +17,17 @@ class MakeleSerializer(serializers.ModelSerializer):
     def get_time_since_pub(self, obj):
         now = datetime.now()
         pub_time = obj.published_date
-        time_delta = timesince(pub_time, now)
-        return time_delta
-
+        if obj.is_active:
+            time_delta = timesince(pub_time, now)
+            return time_delta
+        else:
+            return 'This field can not be full, because; this Makele passive'
+    
+    def validate_published_date(self, pub_date):
+        today = date.today()
+        if pub_date > today:
+            raise serializers.ValidationError('Published date can not be greater than today !')
+        return pub_date
 
 
 # Standart Serializer Code 👇🏻
